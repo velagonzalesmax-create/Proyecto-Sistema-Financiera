@@ -1,11 +1,5 @@
 services:
   - type: web
     name: Proyecto-Sistema-Financiera
-    env: php
-    buildCommand: composer install --no-dev --optimize-autoloader && npm install && npm run build
-    startCommand: vendor/bin/heroku-php-apache2 public/
-    envVars:
-      - key: APP_ENV
-        value: production
-      - key: APP_DEBUG
-        value: false
+    runtime: docker
+    plan: free
