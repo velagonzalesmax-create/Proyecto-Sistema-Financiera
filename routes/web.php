@@ -6,6 +6,7 @@ use App\Http\Controllers\MovimientoController;
 use App\Models\Movimiento;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Artisan;
 
 Route::get('/', function () {
     return view('welcome');
@@ -61,3 +62,13 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__ . '/auth.php';
+
+// Ruta secreta temporal para ejecutar migraciones desde el navegador
+Route::get('/ejecutar-migraciones-secretas', function () {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        return '<h1>¡Migraciones ejecutadas exitosamente en Aiven!</h1><pre>' . Artisan::output() . '</pre>';
+    } catch (\Exception $e) {
+        return '<h1>Error en la migración:</h1><pre>' . $e->getMessage() . '</pre>';
+    }
+});
