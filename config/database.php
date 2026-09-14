@@ -60,8 +60,7 @@ return [
             'strict' => true,
             'engine' => null,
             'options' => extension_loaded('pdo_mysql') ? array_filter([
-            PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            PDO::MYSQL_ATTR_SSL_VERIFY_SERVER_CERT => false,
+            1012 => env('MYSQL_ATTR_SSL_CA'), // 1012 es el valor numérico de MYSQL_ATTR_SSL_CA
         ]) : [],
         ],
 
