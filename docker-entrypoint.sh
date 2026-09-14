@@ -1,9 +1,5 @@
 #!/bin/bash
 set -e
 
-php artisan key:generate --force || true
-php artisan config:clear
-php artisan cache:clear
-php artisan migrate --force || true
-
+# Arrancar Apache directamente para asegurar que Render se ponga en Live
 exec apache2-foreground
