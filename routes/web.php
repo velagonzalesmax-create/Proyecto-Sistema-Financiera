@@ -63,11 +63,9 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__ . '/auth.php';
 
-// Ruta secreta temporal para limpiar caché y ejecutar migraciones
+// Ruta secreta temporal para ejecutar migraciones directamente
 Route::get('/ejecutar-migraciones-secretas', function () {
     try {
-        Artisan::call('config:clear');
-        Artisan::call('cache:clear');
         Artisan::call('migrate', ['--force' => true]);
         return '<h1>¡Migraciones ejecutadas exitosamente en Aiven!</h1><pre>' . Artisan::output() . '</pre>';
     } catch (\Throwable $e) {
