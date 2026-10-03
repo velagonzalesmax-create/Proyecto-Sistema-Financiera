@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\MovimientoController;
+use App\Http\Controllers\PagoRecurrenteController;
 use App\Models\Movimiento;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -59,6 +60,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/movimientos', [MovimientoController::class, 'store'])->name('movimientos.store');
     Route::put('/movimientos/{movimiento}', [MovimientoController::class, 'update'])->name('movimientos.update');
     Route::delete('/movimientos/{movimiento}', [MovimientoController::class, 'destroy'])->name('movimientos.destroy');
+
+    // Rutas para Pagos Recurrentes
+    Route::get('/pagos-recurrentes', [PagoRecurrenteController::class, 'index'])->name('pagos_recurrentes.index');
+    Route::post('/pagos-recurrentes', [PagoRecurrenteController::class, 'store'])->name('pagos_recurrentes.store');
+    Route::delete('/pagos-recurrentes/{id}', [PagoRecurrenteController::class, 'destroy'])->name('pagos_recurrentes.destroy');
 });
 
 require __DIR__ . '/auth.php';

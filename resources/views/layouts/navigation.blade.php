@@ -23,6 +23,10 @@
                     <x-nav-link :href="route('movimientos.index')" :active="request()->routeIs('movimientos.*')">
                         {{ __('Movimientos') }}
                     </x-nav-link>
+
+                    <x-nav-link :href="route('pagos_recurrentes.index')" :active="request()->routeIs('pagos_recurrentes.*')">
+                        {{ __('Pagos Recurrentes') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -85,6 +89,10 @@
 
             <x-responsive-nav-link :href="route('movimientos.index')" :active="request()->routeIs('movimientos.*')">
                 {{ __('Movimientos') }}
+            </x-responsive-nav-link>
+
+            <x-responsive-nav-link :href="route('pagos_recurrentes.index')" :active="request()->routeIs('pagos_recurrentes.*')">
+                {{ __('Pagos Recurrentes') }}
             </x-responsive-nav-link>
         </div>
 
