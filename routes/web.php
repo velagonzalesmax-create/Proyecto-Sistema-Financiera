@@ -67,4 +67,14 @@ Route::middleware('auth')->group(function () {
     Route::delete('/pagos-recurrentes/{id}', [PagoRecurrenteController::class, 'destroy'])->name('pagos_recurrentes.destroy');
 });
 
+// Ruta secreta para ejecutar migraciones en producción
+Route::get('/ejecutar-migracion-secret', function () {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        return 'Migración ejecutada con éxito: <pre>' . Artisan::output() . '</pre>';
+    } catch (\Exception $e) {
+        return 'Error al ejecutar la migración: ' . $e->getMessage();
+    }
+});
+
 require __DIR__ . '/auth.php';
