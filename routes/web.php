@@ -67,10 +67,12 @@ Route::middleware('auth')->group(function () {
     Route::delete('/pagos-recurrentes/{id}', [PagoRecurrenteController::class, 'destroy'])->name('pagos_recurrentes.destroy');
 });
 
-// Ruta temporal para migrar en Render sin pagar
 Route::get('/ejecutar-migracion-secret', function () {
     Artisan::call('migrate', ['--force' => true]);
-    return '¡Migración ejecutada con éxito!';
-});            
+    Artisan::call('config:clear');
+    Artisan::call('route:clear');
+    Artisan::call('view:clear');
+    return '¡Migración y caché limpiadas con éxito!';
+});       
 
 require __DIR__ . '/auth.php';
