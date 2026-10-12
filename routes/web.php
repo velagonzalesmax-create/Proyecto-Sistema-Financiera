@@ -65,14 +65,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/pagos-recurrentes', [PagoRecurrenteController::class, 'index'])->name('pagos_recurrentes.index');
     Route::post('/pagos-recurrentes', [PagoRecurrenteController::class, 'store'])->name('pagos_recurrentes.store');
     Route::delete('/pagos-recurrentes/{id}', [PagoRecurrenteController::class, 'destroy'])->name('pagos_recurrentes.destroy');
-});
-
-Route::get('/ejecutar-migracion-secret', function () {
-    Artisan::call('migrate', ['--force' => true]);
-    Artisan::call('config:clear');
-    Artisan::call('route:clear');
-    Artisan::call('view:clear');
-    return '¡Migración y caché limpiadas con éxito!';
 });       
 
 require __DIR__ . '/auth.php';
