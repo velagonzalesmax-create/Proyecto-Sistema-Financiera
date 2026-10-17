@@ -96,6 +96,11 @@
                     </thead>
                     <tbody class="divide-y divide-gray-200 text-sm text-gray-700">
                         @forelse($pagos as $pago)
+                            @php
+                                $hoy = \Carbon\Carbon::now()->startOfDay();
+                                $vencimiento = \Carbon\Carbon::parse($pago->fecha_vencimiento)->startOfDay();
+                                $diasRestantes = (int) $hoy->diffInDays($vencimiento, false);
+                            @endphp
                             <tr>
                                 <td class="p-3 font-medium text-gray-900">{{ $pago->nombre }}</td>
                                 <td class="p-3">{{ $pago->categoria->nombre ?? '-' }}</td>
@@ -104,9 +109,23 @@
                                 <td class="p-3">{{ \Carbon\Carbon::parse($pago->fecha_vencimiento)->format('d/m/Y') }}</td>
                                 <td class="p-3">{{ $pago->dias_preaviso }} días antes</td>
                                 <td class="p-3">
-                                    <span class="px-2.5 py-1 rounded-full text-xs font-semibold {{ $pago->estado === 'activo' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                        {{ ucfirst($pago->estado) }}
-                                    </span>
+                                    @if($diasRestantes < 0)
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800 border border-red-200">
+                                            ⚠️ Vencido hace {{ abs($diasRestantes) }} {{ abs($diasRestantes) == 1 ? 'día' : 'días' }}
+                                        </span>
+                                    @elseif($diasRestantes === 0)
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800 border border-orange-200 animate-pulse">
+                                            ¡Vence hoy!
+                                        </span>
+                                    @elseif($diasRestantes <= 3)
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800 border border-yellow-200">
+                                            Vence en {{ $diasRestantes }} {{ $diasRestantes == 1 ? 'día' : 'días' }}
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800 border border-green-200">
+                                            Al día
+                                        </span>
+                                    @endif
                                 </td>
                                 <td class="p-3 text-right">
                                     <form id="form-delete-pago-{{ $pago->id }}" action="{{ route('pagos_recurrentes.destroy', $pago->id) }}" method="POST" class="inline">
