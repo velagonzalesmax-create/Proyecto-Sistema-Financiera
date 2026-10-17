@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\PagoRecurrente;
 use App\Models\Categoria;
+use App\Models\Movimiento;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -54,6 +56,36 @@ class PagoRecurrenteController extends Controller
         ]);
 
         return redirect()->back()->with('success', 'Pago recurrente programado con éxito.');
+    }
+
+    /**
+     * Marca un pago recurrente como pagado, registra el gasto y actualiza su fecha de vencimiento.
+     *
+     * @param int|string $id
+     */
+    public function marcarComoPagado($id)
+    {
+        $userId = Auth::id();
+
+        $pago = PagoRecurrente::where('user_id', $userId)->findOrFail($id);
+
+        // Registrar un nuevo movimiento/transacción como gasto
+        Movimiento::create([
+            'user_id' => $userId,
+            'categoria_id' => $pago->categoria_id,
+            'monto' => $pago->monto,
+            'tipo' => 'gasto',
+            'descripcion' => 'Pago de: ' . $pago->nombre,
+            'fecha' => Carbon::now()->toDateString(),
+        ]);
+
+        // Actualizar la fecha de vencimiento sumándole 1 mes con Carbon
+        $pago->fecha_vencimiento = Carbon::parse($pago->fecha_vencimiento)->addMonth();
+        $pago->save();
+
+        session()->flash('success', 'Pago registrado como egreso y fecha actualizada.');
+
+        return redirect()->back();
     }
 
     /**

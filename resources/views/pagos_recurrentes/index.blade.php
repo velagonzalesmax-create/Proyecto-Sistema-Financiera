@@ -127,14 +127,29 @@
                                         </span>
                                     @endif
                                 </td>
-                                <td class="p-3 text-right">
+                                <td class="p-3 text-right space-x-2 whitespace-nowrap">
+                                    <!-- Botón Marcar como Pagado -->
+                                    <form action="{{ route('pagos_recurrentes.pagar', $pago->id) }}" method="POST" class="inline">
+                                        @csrf
+                                        <button 
+                                            type="submit" 
+                                            class="inline-flex items-center px-2.5 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-semibold rounded shadow-sm transition ease-in-out duration-150"
+                                            title="Registrar gasto y avanzar fecha de vencimiento">
+                                            <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                            </svg>
+                                            Marcar como Pagado
+                                        </button>
+                                    </form>
+
+                                    <!-- Botón Eliminar con SweetAlert2 -->
                                     <form id="form-delete-pago-{{ $pago->id }}" action="{{ route('pagos_recurrentes.destroy', $pago->id) }}" method="POST" class="inline">
                                         @csrf
                                         @method('DELETE')
                                         <button 
                                             type="button" 
                                             onclick="confirmarEliminarPago({{ $pago->id }}, @js($pago->nombre), '{{ number_format($pago->monto, 2) }}')" 
-                                            class="text-red-600 hover:text-red-900 font-medium">
+                                            class="text-red-600 hover:text-red-900 font-medium text-xs">
                                             Eliminar
                                         </button>
                                     </form>

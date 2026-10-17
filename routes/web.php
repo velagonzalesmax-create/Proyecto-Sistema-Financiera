@@ -64,6 +64,7 @@ Route::middleware('auth')->group(function () {
     // Rutas para Pagos Recurrentes
     Route::get('/pagos-recurrentes', [PagoRecurrenteController::class, 'index'])->name('pagos_recurrentes.index');
     Route::post('/pagos-recurrentes', [PagoRecurrenteController::class, 'store'])->name('pagos_recurrentes.store');
+    Route::post('/pagos-recurrentes/{id}/pagar', [PagoRecurrenteController::class, 'marcarComoPagado'])->name('pagos_recurrentes.pagar');
     Route::delete('/pagos-recurrentes/{id}', [PagoRecurrenteController::class, 'destroy'])->name('pagos_recurrentes.destroy');
 });
 
