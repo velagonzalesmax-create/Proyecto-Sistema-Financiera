@@ -5,6 +5,8 @@ use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\MovimientoController;
 use App\Http\Controllers\PagoRecurrenteController;
 use App\Models\Movimiento;
+use App\Models\PagoRecurrente;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Artisan;
@@ -39,7 +41,33 @@ Route::get('/dashboard', function () {
     $catNombres = $gastosPorCategoria->keys()->toArray();
     $catMontos = $gastosPorCategoria->values()->toArray();
 
-    return view('dashboard', compact('ingresos', 'gastos', 'balance', 'ultimosMovimientos', 'catNombres', 'catMontos'));
+    // Métricas de Pagos Recurrentes
+    $hoy = Carbon::now()->startOfDay();
+    $proximos7Dias = Carbon::now()->addDays(7)->endOfDay();
+
+    $pagosVencidos = PagoRecurrente::where('user_id', $user_id)
+        ->where('fecha_vencimiento', '<', $hoy)
+        ->count();
+
+    $pagosPorVencer = PagoRecurrente::where('user_id', $user_id)
+        ->whereBetween('fecha_vencimiento', [$hoy, $proximos7Dias])
+        ->count();
+
+    $totalRecurrenteMes = PagoRecurrente::where('user_id', $user_id)
+        ->where('estado', 'activo')
+        ->sum('monto');
+
+    return view('dashboard', compact(
+        'ingresos',
+        'gastos',
+        'balance',
+        'ultimosMovimientos',
+        'catNombres',
+        'catMontos',
+        'pagosVencidos',
+        'pagosPorVencer',
+        'totalRecurrenteMes'
+    ));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -63,6 +91,7 @@ Route::middleware('auth')->group(function () {
 
     // Rutas para Pagos Recurrentes
     Route::get('/pagos-recurrentes', [PagoRecurrenteController::class, 'index'])->name('pagos_recurrentes.index');
+    Route::get('/pagos-recurrentes-gestion', [PagoRecurrenteController::class, 'index'])->name('pagos-recurrentes.index');
     Route::post('/pagos-recurrentes', [PagoRecurrenteController::class, 'store'])->name('pagos_recurrentes.store');
     Route::post('/pagos-recurrentes/{id}/pagar', [PagoRecurrenteController::class, 'marcarComoPagado'])->name('pagos_recurrentes.pagar');
     Route::delete('/pagos-recurrentes/{id}', [PagoRecurrenteController::class, 'destroy'])->name('pagos_recurrentes.destroy');
