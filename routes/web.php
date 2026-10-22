@@ -97,4 +97,15 @@ Route::middleware('auth')->group(function () {
     Route::delete('/pagos-recurrentes/{id}', [PagoRecurrenteController::class, 'destroy'])->name('pagos_recurrentes.destroy');
 });
 
+// Ruta de prueba temporal para ejecutar notificaciones de pagos recurrentes
+Route::get('/probar-correo', function () {
+    try {
+        Artisan::call('pagos:notificar');
+        $output = Artisan::output();
+        return 'Notificaciones de pagos ejecutadas con éxito.<br><pre>' . htmlspecialchars($output) . '</pre>';
+    } catch (\Exception $e) {
+        return 'Error al ejecutar las notificaciones: ' . $e->getMessage();
+    }
+});
+
 require __DIR__ . '/auth.php';
