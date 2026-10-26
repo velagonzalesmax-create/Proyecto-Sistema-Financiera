@@ -41,6 +41,47 @@ Route::get('/dashboard', function () {
     $catNombres = $gastosPorCategoria->keys()->toArray();
     $catMontos = $gastosPorCategoria->values()->toArray();
 
+    // Comparación porcentual con el mes anterior para KPIs
+    $inicioMesActual = Carbon::now()->startOfMonth();
+    $finMesActual = Carbon::now()->endOfMonth();
+    $inicioMesAnterior = Carbon::now()->subMonth()->startOfMonth();
+    $finMesAnterior = Carbon::now()->subMonth()->endOfMonth();
+
+    $ingresosMesActual = Movimiento::where('user_id', $user_id)
+        ->where('tipo', 'ingreso')
+        ->whereBetween('fecha', [$inicioMesActual->toDateString(), $finMesActual->toDateString()])
+        ->sum('monto');
+
+    $ingresosMesAnterior = Movimiento::where('user_id', $user_id)
+        ->where('tipo', 'ingreso')
+        ->whereBetween('fecha', [$inicioMesAnterior->toDateString(), $finMesAnterior->toDateString()])
+        ->sum('monto');
+
+    $diffIngresos = $ingresosMesAnterior > 0 
+        ? round((($ingresosMesActual - $ingresosMesAnterior) / $ingresosMesAnterior) * 100, 1)
+        : ($ingresosMesActual > 0 ? 100 : 0);
+
+    $gastosMesActual = Movimiento::where('user_id', $user_id)
+        ->where('tipo', 'gasto')
+        ->whereBetween('fecha', [$inicioMesActual->toDateString(), $finMesActual->toDateString()])
+        ->sum('monto');
+
+    $gastosMesAnterior = Movimiento::where('user_id', $user_id)
+        ->where('tipo', 'gasto')
+        ->whereBetween('fecha', [$inicioMesAnterior->toDateString(), $finMesAnterior->toDateString()])
+        ->sum('monto');
+
+    $diffGastos = $gastosMesAnterior > 0 
+        ? round((($gastosMesActual - $gastosMesAnterior) / $gastosMesAnterior) * 100, 1)
+        : ($gastosMesActual > 0 ? 100 : 0);
+
+    $balanceMesActual = $ingresosMesActual - $gastosMesActual;
+    $balanceMesAnterior = $ingresosMesAnterior - $gastosMesAnterior;
+
+    $diffBalance = $balanceMesAnterior != 0 
+        ? round((($balanceMesActual - $balanceMesAnterior) / abs($balanceMesAnterior)) * 100, 1)
+        : ($balanceMesActual != 0 ? 100 : 0);
+
     // Métricas de Pagos Recurrentes
     $hoy = Carbon::now()->startOfDay();
     $proximos7Dias = Carbon::now()->addDays(7)->endOfDay();
@@ -64,6 +105,9 @@ Route::get('/dashboard', function () {
         'ultimosMovimientos',
         'catNombres',
         'catMontos',
+        'diffIngresos',
+        'diffGastos',
+        'diffBalance',
         'pagosVencidos',
         'pagosPorVencer',
         'totalRecurrenteMes'
